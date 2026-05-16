@@ -41,10 +41,7 @@ jobs:
           issue_url=$(gh issue create \
             --repo github/spec-kit \
             --title "Extension Submission: Squad Bridge v${VERSION}" \
-            --body-file /tmp/catalog-submission-final.md \
-            --label "extension-submission" \
-            --label "enhancement" \
-            --label "needs-triage")
+            --body-file /tmp/catalog-submission-final.md)
           echo "url=$issue_url" >> $GITHUB_OUTPUT
 
       - name: Write job summary
