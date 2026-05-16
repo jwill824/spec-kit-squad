@@ -22,6 +22,9 @@ jobs:
         with:
           token: ${{ secrets.GH_TOKEN }}
 
+      - name: Install Python dependencies
+        run: pip install pyyaml jinja2
+
       - name: File catalog submission issue
         id: issue
         env:
@@ -32,7 +35,7 @@ jobs:
           DOWNLOAD_URL: https://github.com/jwill824/spec-kit-squad/archive/refs/tags/${{ steps.version.outputs.tag }}.zip
         run: |
           python3 .github/scripts/build-catalog-submission.py \
-            .github/templates/catalog-submission.md \
+            .github/templates/catalog-submission.md.j2 \
             /tmp/catalog-submission-final.md
 
           issue_url=$(gh issue create \
