@@ -41,7 +41,7 @@ spec evolves, `generate` keeps the team in sync. When tasks are generated,
 - [Squad](https://bradygaster.github.io/squad/) `>=0.1.0`
 
 ```bash
-npm install -g @bradygaster/squad
+npm install -g @bradygaster/squad-cli
 ```
 
 ---
@@ -183,7 +183,7 @@ Key options:
 ## Troubleshooting
 
 **`squad: command not found`**
-Squad is not installed. Run `npm install -g @bradygaster/squad` and verify with `squad --version`.
+Squad is not installed. Run `npm install -g @bradygaster/squad-cli` and verify with `squad --version`.
 
 **`/speckit.squad.init` reports no spec found**
 Run `/speckit.specify` first — the init command reads `specs/<id>/spec.md`.
