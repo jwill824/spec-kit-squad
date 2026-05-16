@@ -134,7 +134,7 @@ cp .specify/extensions/squad/squad-config.template.yml \
 Key options:
 
 | Option | Default | Description |
-|---|---|---|
+| --- | --- | --- |
 | `agent_model` | `claude-sonnet-4` | Model used when generating agents |
 | `routing_strategy` | `capability-match` | `capability-match` or `round-robin` |
 | `squad_root` | `.squad` | Path to Squad root directory |
@@ -147,7 +147,7 @@ Key options:
 ## Hooks
 
 | Hook | Command | Default |
-|---|---|---|
+| --- | --- | --- |
 | `after_specify` | `speckit.squad.generate` | Optional (prompts user) |
 | `after_tasks` | `speckit.squad.route` | Optional (prompts user) |
 
