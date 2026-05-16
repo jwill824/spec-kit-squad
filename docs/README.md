@@ -47,9 +47,16 @@ spec-kit-squad/
 │   ├── README.md              # ← you are here
 │   ├── CONTRIBUTING.md        # How to contribute
 │   └── CHANGELOG.md           # Version history
-├── .github/workflows/
-│   ├── release.yml            # Auto-bump semver on changes to commands/ or extension.yml
-│   └── lint.yml               # Lint YAML and Markdown on every push
+├── .github/
+│   ├── scripts/
+│   │   └── build-catalog-submission.py  # Jinja2 renderer: extension.yml → issue body
+│   ├── templates/
+│   │   └── catalog-submission.md.j2     # Jinja2 template for spec-kit catalog issue
+│   └── workflows/
+│       ├── release.yml        # Auto-bump semver on changes to commands/ or extension.yml
+│       ├── lint.yml           # Lint YAML and Markdown on non-main pushes + PRs to main
+│       ├── test.yml           # Run extension smoke tests on non-main pushes + PRs to main
+│       └── catalog-submit.yml # File catalog submission issue on github/spec-kit on release
 ├── README.md                  # User-facing docs (installed with extension)
 └── LICENSE
 ```
@@ -74,13 +81,36 @@ plugin pipeline:
 
 Config: `.releaserc.json`
 
-> **Requires** a `GH_TOKEN` repository secret (Personal Access Token with
-> `repo` scope) — `GITHUB_TOKEN` cannot push back to the branch.
+> **Requires** a `GH_TOKEN` repository secret (fine-grained Personal Access Token
+> with contents/metadata read and write access to this repo) — `GITHUB_TOKEN`
+> cannot push back to the branch.
 
 ### `lint.yml` — YAML + Markdown Linting
 
-Triggers on every push and on pull requests to `main`. Lints all `.yml` files
-with `yamllint` and all `.md` files with `markdownlint-cli2`. Configuration:
+Triggers on push to non-main branches and on pull requests targeting `main`.
+Lints all `.yml` files with `yamllint` and all `.md` files with
+`markdownlint-cli2`. Configuration:
 
 - `.yamllint.yml` — relaxed line length, truthy disabled
 - `.markdownlint.json` — MD013 (line length) and MD033 (inline HTML) disabled
+
+### `test.yml` — Extension Smoke Tests
+
+Triggers on push to non-main branches and on pull requests targeting `main`.
+Validates that all command files referenced in `extension.yml` exist and that
+`extension.yml` parses as valid YAML.
+
+### `catalog-submit.yml` — Spec Kit Catalog Submission
+
+Triggers on every release publish and on `workflow_dispatch` (with an optional
+`tag` input for resubmission). On each run it:
+
+1. Renders `.github/templates/catalog-submission.md.j2` via
+   `.github/scripts/build-catalog-submission.py` — all values sourced from
+   `extension.yml`, nothing hardcoded
+2. Closes any previously open catalog submission issues (to avoid stale entries)
+3. Opens a new issue on `github/spec-kit` with the rendered body
+
+> **Requires** a `PUBLIC_REPO_TOKEN` repository secret — a classic Personal
+> Access Token with `public_repo` scope. Fine-grained PATs cannot create issues
+> on third-party public repositories.

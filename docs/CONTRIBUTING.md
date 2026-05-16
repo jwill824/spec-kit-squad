@@ -49,7 +49,12 @@ spec-kit-squad/
 │   ├── README.md                  # Developer architecture reference
 │   ├── CONTRIBUTING.md            # ← this file
 │   └── CHANGELOG.md               # Version history
-├── .github/workflows/             # CI (not installed with extension)
+├── .github/
+│   ├── scripts/
+│   │   └── build-catalog-submission.py  # Jinja2 renderer: extension.yml → issue body
+│   ├── templates/
+│   │   └── catalog-submission.md.j2     # Jinja2 template for spec-kit catalog issue
+│   └── workflows/                 # CI (not installed with extension)
 ├── README.md                      # User-facing docs
 └── LICENSE
 ```
@@ -79,4 +84,9 @@ Releases are fully automated via `semantic-release`. When a PR is merged to
 5. Commits those files back with `[skip ci]`
 6. Creates a git tag and GitHub Release
 
-> **Requires** a `GH_TOKEN` repo secret (PAT with `repo` scope).
+> **Requires two secrets:**
+>
+> - `GH_TOKEN` — fine-grained PAT with contents/metadata read+write access
+>   (used by semantic-release to push back the changelog and tag commits)
+> - `PUBLIC_REPO_TOKEN` — classic PAT with `public_repo` scope (used by
+>   `catalog-submit.yml` to open issues on `github/spec-kit`)

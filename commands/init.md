@@ -19,7 +19,7 @@ squad --version
 If that fails, install it first:
 
 ```bash
-npm install -g @bradygaster/squad-cli
+npm install -g @bradygaster/squad
 ```
 
 ## User Input
