@@ -31,46 +31,9 @@ jobs:
           DATE: ${{ steps.version.outputs.date }}
           DOWNLOAD_URL: https://github.com/jwill824/spec-kit-squad/archive/refs/tags/${{ steps.version.outputs.tag }}.zip
         run: |
-          python3 - << 'PYEOF'
-          import yaml, os
-
-          with open('extension.yml') as f:
-              ext = yaml.safe_load(f)
-
-          speckit_version = ext.get('requires', {}).get('speckit_version', '>=0.1.0')
-          commands_count  = len(ext.get('provides', {}).get('commands', []))
-          hooks_count     = len(ext.get('hooks', {}))
-
-          tools = ext.get('requires', {}).get('tools', [])
-          if tools:
-              lines = []
-              for t in tools:
-                  req = 'required' if t.get('required') else 'optional'
-                  lines.append(f"- {t['name']} {t.get('version', '')} ({req})")
-              required_tools = '\n'.join(lines)
-          else:
-              required_tools = 'None'
-
-          substitutions = {
-              '$VERSION':        os.environ['VERSION'],
-              '$TAG':            os.environ['TAG'],
-              '$DATE':           os.environ['DATE'],
-              '$DOWNLOAD_URL':   os.environ['DOWNLOAD_URL'],
-              '$SPECKIT_VERSION': speckit_version,
-              '$COMMANDS_COUNT': str(commands_count),
-              '$HOOKS_COUNT':    str(hooks_count),
-              '$REQUIRED_TOOLS': required_tools,
-          }
-
-          with open('.github/templates/catalog-submission.md') as f:
-              content = f.read()
-
-          for placeholder, value in substitutions.items():
-              content = content.replace(placeholder, value)
-
-          with open('/tmp/catalog-submission-final.md', 'w') as f:
-              f.write(content)
-          PYEOF
+          python3 .github/scripts/build-catalog-submission.py \
+            .github/templates/catalog-submission.md \
+            /tmp/catalog-submission-final.md
 
           issue_url=$(gh issue create \
             --repo github/spec-kit \

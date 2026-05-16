@@ -1,10 +1,10 @@
 ### Extension ID
 
-squad
+$EXT_ID
 
 ### Extension Name
 
-Squad Bridge
+$EXT_NAME
 
 ### Version
 
@@ -12,15 +12,15 @@ $VERSION
 
 ### Description
 
-Bootstrap and synchronize a Squad agent team from your Speckit spec and tasks.
+$EXT_DESCRIPTION
 
 ### Author
 
-jwill824
+$EXT_AUTHOR
 
 ### Repository URL
 
-<https://github.com/jwill824/spec-kit-squad>
+<$EXT_REPOSITORY>
 
 ### Download URL
 
@@ -28,19 +28,19 @@ $DOWNLOAD_URL
 
 ### License
 
-MIT
+$EXT_LICENSE
 
 ### Homepage (optional)
 
-<https://github.com/jwill824/spec-kit-squad>
+<$EXT_HOMEPAGE>
 
 ### Documentation URL (optional)
 
-<https://github.com/jwill824/spec-kit-squad/blob/main/README.md>
+<$EXT_DOCUMENTATION>
 
 ### Changelog URL (optional)
 
-<https://github.com/jwill824/spec-kit-squad/blob/main/docs/CHANGELOG.md>
+<$EXT_CHANGELOG>
 
 ### Required Spec Kit Version
 
@@ -60,14 +60,11 @@ $HOOKS_COUNT
 
 ### Tags
 
-multi-agent, agents, orchestration, process, integration
+$TAGS
 
 ### Key Features
 
-- Bootstrap a Squad agent team from your Speckit spec and tasks
-- Generate agent configurations from spec requirements
-- Route tasks to appropriate agents based on complexity tiers (full/standard/lightweight)
-- Check status and health of your Squad team with `squad doctor`
+$KEY_FEATURES
 
 ### Testing Checklist
 
@@ -88,43 +85,33 @@ multi-agent, agents, orchestration, process, integration
 
 ### Testing Details
 
-Tested on macOS with Spec Kit >=0.1.0. Commands tested: `/speckit.squad.init`, `/speckit.squad.generate`, `/speckit.squad.route`, `/speckit.squad.status`.
+Tested on macOS with Spec Kit $SPECKIT_VERSION. Commands tested: $COMMANDS_LIST.
 
 ### Example Usage
 
 ```bash
 # Install the extension
-specify extension add squad --from $DOWNLOAD_URL
+specify extension add $EXT_ID --from $DOWNLOAD_URL
 
-# Initialize a Squad team from your spec
-# /speckit.squad.init
-
-# Generate agent configs
-# /speckit.squad.generate
-
-# Route tasks to agents
-# /speckit.squad.route
-
-# Check Squad health
-# /speckit.squad.status
+$COMMANDS_USAGE
 ```
 
 ### Proposed Catalog Entry
 
 ```json
 {
-  "squad": {
-    "name": "Squad Bridge",
-    "id": "squad",
-    "description": "Bootstrap and synchronize a Squad agent team from your Speckit spec and tasks.",
-    "author": "jwill824",
+  "$EXT_ID": {
+    "name": "$EXT_NAME",
+    "id": "$EXT_ID",
+    "description": "$EXT_DESCRIPTION",
+    "author": "$EXT_AUTHOR",
     "version": "$VERSION",
     "download_url": "$DOWNLOAD_URL",
-    "repository": "https://github.com/jwill824/spec-kit-squad",
-    "homepage": "https://github.com/jwill824/spec-kit-squad",
-    "documentation": "https://github.com/jwill824/spec-kit-squad/blob/main/README.md",
-    "changelog": "https://github.com/jwill824/spec-kit-squad/blob/main/docs/CHANGELOG.md",
-    "license": "MIT",
+    "repository": "$EXT_REPOSITORY",
+    "homepage": "$EXT_HOMEPAGE",
+    "documentation": "$EXT_DOCUMENTATION",
+    "changelog": "$EXT_CHANGELOG",
+    "license": "$EXT_LICENSE",
     "requires": {
       "speckit_version": "$SPECKIT_VERSION"
     },
@@ -132,7 +119,7 @@ specify extension add squad --from $DOWNLOAD_URL
       "commands": $COMMANDS_COUNT,
       "hooks": $HOOKS_COUNT
     },
-    "tags": ["multi-agent", "agents", "orchestration", "process", "integration"],
+    "tags": $TAGS_JSON,
     "verified": false,
     "downloads": 0,
     "stars": 0,
@@ -144,4 +131,4 @@ specify extension add squad --from $DOWNLOAD_URL
 
 ### Additional Context
 
-Automated submission opened by the [catalog-submit workflow](https://github.com/jwill824/spec-kit-squad/actions/workflows/catalog-submit.yml) on release of v$VERSION. If an entry for `squad` already exists in the catalog, please treat this as a version update.
+Automated submission opened by the [catalog-submit workflow]($EXT_REPOSITORY/actions/workflows/catalog-submit.yml) on release of v$VERSION. If an entry for `$EXT_ID` already exists in the catalog, please treat this as a version update.
