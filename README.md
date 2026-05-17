@@ -37,7 +37,7 @@ spec evolves, `generate` keeps the team in sync. When tasks are generated,
 
 ## Requirements
 
-- [Spec Kit](https://github.com/github/spec-kit) `>=0.1.0`
+- [Spec Kit](https://github.com/github/spec-kit) `>=0.9.4`
 - [Squad CLI](https://bradygaster.github.io/squad/docs/get-started/installation/) `>=0.1.0`
 
 ```bash

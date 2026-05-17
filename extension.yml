@@ -13,7 +13,7 @@ extension:
   homepage: "https://github.com/jwill824/spec-kit-squad"
 
 requires:
-  speckit_version: ">=0.8.11"
+  speckit_version: ">=0.9.4"
   tools:
     - name: "@bradygaster/squad"
       version: ">=0.1.0"
