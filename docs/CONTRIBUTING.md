@@ -77,6 +77,19 @@ spec-kit-squad/
 Releases are fully automated via `semantic-release`. When a PR is merged to
 `main`, the CI action automatically:
 
+```mermaid
+flowchart TD
+    A["PR merged to main"] --> B["commit-analyzer"]
+    B --> C{"Bump type?"}
+    C -->|"BREAKING CHANGE"| D["major"]
+    C -->|"feat:"| E["minor"]
+    C -->|"fix: / docs:"| F["patch"]
+    D & E & F --> G["Generate release notes\n+ update CHANGELOG.md"]
+    G --> H["Update version in extension.yml"]
+    H --> I["Create git tag\n+ GitHub Release"]
+    I --> J["catalog-submit.yml\nfile issue on github/spec-kit"]
+```
+
 1. Analyzes commit messages to determine the next version
 2. Generates release notes from conventional commits
 3. Writes/updates `docs/CHANGELOG.md`

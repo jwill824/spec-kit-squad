@@ -19,13 +19,22 @@ The extension is a thin bridge between two tools:
 - **[Squad](https://bradygaster.github.io/squad/)** manages a team of AI agents
   with declared capabilities and owns `.squad/`
 
-```
-Spec Kit artifacts          Squad artifacts
-──────────────────          ───────────────
-specs/<id>/spec.md  ──────► .squad/agents/{name}/charter.md
-specs/<id>/tasks.md ──────► .squad/routing.md
-                            .squad/team.md
-                            squad.config.ts
+```mermaid
+flowchart LR
+    subgraph sk["Spec Kit artifacts"]
+        S1["specs/&lt;id&gt;/spec.md"]
+        S2["specs/&lt;id&gt;/tasks.md"]
+    end
+    subgraph sq["Squad artifacts"]
+        D1[".squad/agents/{name}/charter.md"]
+        D2[".squad/routing.md"]
+        D3[".squad/team.md"]
+        D4["squad.config.ts"]
+    end
+    S1 --> D1
+    S1 --> D3
+    S1 --> D4
+    S2 --> D2
 ```
 
 Each command file in `commands/` is a Markdown prompt executed by the Spec Kit
@@ -72,6 +81,17 @@ Triggers on every push to `main` (and `workflow_dispatch`). Uses
 [`semantic-release`](https://semantic-release.gitbook.io/) with the following
 plugin pipeline:
 
+```mermaid
+flowchart TD
+    A["Push to main"] --> B["commit-analyzer\ndetermine version bump"]
+    B --> C["release-notes-generator"]
+    C --> D["changelog\nwrite docs/CHANGELOG.md"]
+    D --> E["exec\nupdate version in extension.yml"]
+    E --> F["git\ncommit changelog + extension.yml"]
+    F --> G["github\ncreate GitHub Release"]
+    G --> H["catalog-submit.yml\nfile issue on github/spec-kit"]
+```
+
 1. **`commit-analyzer`** — determines version bump from conventional commits
 2. **`release-notes-generator`** — generates release notes
 3. **`changelog`** — writes/updates `docs/CHANGELOG.md`
@@ -104,6 +124,13 @@ Validates that all command files referenced in `extension.yml` exist and that
 
 Triggers on every release publish and on `workflow_dispatch` (with an optional
 `tag` input for resubmission). On each run it:
+
+```mermaid
+flowchart TD
+    A["Release published\nor workflow_dispatch"] --> B["Render catalog-submission.md.j2\nbuild-catalog-submission.py"]
+    B --> C["Close any open stale\ncatalog submission issues"]
+    C --> D["gh issue create\n--repo github/spec-kit"]
+```
 
 1. Renders `.github/templates/catalog-submission.md.j2` via
    `.github/scripts/build-catalog-submission.py` — all values sourced from
