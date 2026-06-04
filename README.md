@@ -2,11 +2,12 @@
 
 A [Spec Kit](https://github.com/github/spec-kit) extension that bridges
 [Squad](https://bradygaster.github.io/squad/) — bootstrapping and
-synchronizing an AI agent team directly from your spec.
+synchronizing an AI agent team from your implementation plan, with
+execution support.
 
 **Speckit generates the *what*** (spec → plan → tasks).  
 **Squad manages the *who*** (agents with specialized capabilities).  
-**This extension connects them.**
+**This extension connects them and gets the work done.**
 
 ---
 
@@ -15,18 +16,23 @@ synchronizing an AI agent team directly from your spec.
 ```mermaid
 flowchart TD
     A["/speckit.specify"] --> B["specs/&lt;id&gt;/spec.md"]
-    B --> C["/speckit.squad.init"]
+    B --> B2["/speckit.plan"]
+    B2 --> B3["specs/&lt;id&gt;/plan.md"]
+    B3 --> C["/speckit.squad.init"]
     C --> D[".squad/\nagents + routing"]
     E["/speckit.tasks"] --> F["specs/&lt;id&gt;/tasks.md"]
     F --> G["/speckit.squad.route"]
     D --> H["Task → Agent assignments\n+ routing.md updated"]
     G --> H
+    H --> I["/speckit.squad.run"]
+    I --> J["Agent sessions execute\nbranches + PRs created"]
 ```
 
-After you specify your project, the extension reads the spec, infers
-technology domains and roles, and generates a Squad team to match. As your
-spec evolves, `generate` keeps the team in sync. When tasks are generated,
-`route` distributes them to the right agents automatically.
+After you create your implementation plan, the extension reads it to extract
+your technology stack, then generates a Squad team to match. As your plan
+evolves, `generate` keeps the team in sync. When tasks are generated, `route`
+distributes them to the right agents, and `run` executes them through Squad
+agent sessions.
 
 ---
 
@@ -34,6 +40,7 @@ spec evolves, `generate` keeps the team in sync. When tasks are generated,
 
 - [Spec Kit](https://github.com/github/spec-kit) `>=0.8.11`
 - [Squad](https://bradygaster.github.io/squad/) `>=0.9.4`
+- [GitHub CLI](https://cli.github.com) `>=2.0.0` (required for `/speckit.squad.run`)
 
 ```bash
 npm install -g @bradygaster/squad-cli
@@ -64,11 +71,11 @@ specify extension add squad --dev /path/to/spec-kit-squad
 
 ### `/speckit.squad.init`
 
-Bootstrap a Squad team from the current spec. Run this once after your
-initial `/speckit.specify`.
+Bootstrap a Squad team from the **implementation plan**. Run this once after
+your initial `/speckit.plan`.
 
-- Reads `specs/<id>/spec.md` and (optionally) `specs/<id>/tasks.md`
-- Infers technology domains, roles, and cross-cutting concerns
+- Reads `specs/<id>/plan.md` (primary) and `specs/<id>/spec.md` (context)
+- Extracts technology stack, architecture layers, and phases from the plan
 - Runs `squad init` if `.squad/` doesn't exist
 - Creates agent definitions in `.squad/agents/`
 - Generates routing rules in `.squad/routing.md`
@@ -82,9 +89,9 @@ initial `/speckit.specify`.
 
 ### `/speckit.squad.generate`
 
-Re-generate agent definitions as the spec evolves. Safe to run repeatedly —
+Re-generate agent definitions as the plan evolves. Safe to run repeatedly —
 agents are updated in place; removed domains are marked `inactive`, not
-deleted. Also triggered by the `after_specify` hook.
+deleted. Also triggered by the `after_plan` hook.
 
 ```
 /speckit.squad.generate
@@ -117,6 +124,21 @@ gaps and idle agents.
 
 ---
 
+### `/speckit.squad.run`
+
+Execute routed tasks through Squad agent sessions. Creates a branch per task,
+launches agent sessions (up to `parallel_limit` concurrently), and optionally
+creates PRs on completion.
+
+```
+/speckit.squad.run                   # run all routed tasks
+/speckit.squad.run --dry-run         # preview without executing
+/speckit.squad.run --retry           # re-run failed tasks
+/speckit.squad.run task-03           # run a specific task
+```
+
+---
+
 ## Configuration
 
 After installation, copy the config template:
@@ -136,6 +158,11 @@ Key options:
 | `model_tiers.full` | `claude-opus-4` | Model for complex tasks |
 | `model_tiers.standard` | `claude-sonnet-4` | Model for standard tasks |
 | `model_tiers.lightweight` | `claude-haiku-4.5` | Model for simple tasks |
+| `execution.parallel_limit` | `3` | Max parallel agent sessions |
+| `execution.auto_pr` | `false` | Auto-create PRs on task completion |
+| `execution.session_timeout_minutes` | `30` | Agent session timeout |
+| `execution.branch_pattern` | `squad/{agent}/{task-id}` | Branch naming pattern |
+| `execution.copilot_flags` | `--yolo` | Flags passed to agent sessions |
 
 ---
 
@@ -143,8 +170,14 @@ Key options:
 
 | Hook | Command | Default |
 | --- | --- | --- |
-| `after_specify` | `speckit.squad.generate` | Optional (prompts user) |
+| `after_plan` | `speckit.squad.generate` | Optional (prompts user) |
 | `after_tasks` | `speckit.squad.route` | Optional (prompts user) |
+
+> **Why `after_plan` instead of `after_specify`?** The spec is intentionally
+> tech-agnostic — it captures goals and constraints without dictating
+> implementation. The plan is where concrete technology decisions live
+> (e.g., "React 19", "Go with gin", "PostgreSQL"). Generating agents from
+> the plan produces sharper charters with accurate capabilities and routing.
 
 ---
 
@@ -152,12 +185,12 @@ Key options:
 
 ```mermaid
 flowchart LR
-    A["/speckit.specify"] --> B["/speckit.squad.init"]
-    B --> C["/speckit.plan"]
+    A["/speckit.specify"] --> B["/speckit.plan"]
+    B --> C["/speckit.squad.init"]
     C --> D["/speckit.tasks"]
     D --> E["/speckit.squad.route"]
-    E --> F["/speckit.squad.status"]
-    F --> G["gh copilot\n(run your squad)"]
+    E --> F["/speckit.squad.run"]
+    F --> G["/speckit.squad.status"]
 ```
 
 ---
@@ -167,14 +200,16 @@ flowchart LR
 **`squad: command not found`**
 Squad is not installed. Run `npm install -g @bradygaster/squad-cli` and verify with `squad --version`.
 
-**`/speckit.squad.init` reports no spec found**
-Run `/speckit.specify` first — the init command reads `specs/<id>/spec.md`.
+**`/speckit.squad.init` reports no plan found**
+Run `/speckit.plan` first — the init command reads `specs/<id>/plan.md`, not
+`spec.md`. The spec is tech-agnostic; the plan contains the technology
+decisions needed to generate meaningful agents.
 
 **Agents not appearing after init**
 Check `.squad/agents/` exists. If the directory is missing, Squad CLI may not have initialized correctly. Try `squad init` manually, then re-run `/speckit.squad.init`.
 
 **Hook fires unexpectedly**
-Both hooks (`after_specify`, `after_tasks`) are optional and will prompt before running. If you want to disable them, remove the `hooks:` section from your local copy of `extension.yml` or set the hook's `optional: false` to always skip the prompt.
+Both hooks (`after_plan`, `after_tasks`) are optional and will prompt before running. If you want to disable them, remove the `hooks:` section from your local copy of `extension.yml` or set the hook's `optional: false` to always skip the prompt.
 
 ---
 

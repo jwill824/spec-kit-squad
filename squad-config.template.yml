@@ -15,8 +15,8 @@ squad:
   # Path to the Squad root directory relative to the project root.
   squad_root: ".squad"
 
-  # When true, agent definitions are regenerated automatically after /speckit.specify.
-  # Requires the after_specify hook to be enabled (non-optional).
+  # When true, agent definitions are regenerated automatically after /speckit.plan.
+  # Requires the after_plan hook to be enabled (non-optional).
   auto_generate: false
 
   # Model tier assignments used when generating routing rules.
@@ -27,7 +27,24 @@ squad:
     standard: "claude-sonnet-4"
     lightweight: "claude-haiku-4.5"
 
-  # Default capability level assigned to generated agents when the spec
+  # Default capability level assigned to generated agents when the plan
   # doesn't provide enough signal to infer a more specific level.
   # Options: expert, proficient, basic
   default_capability_level: "proficient"
+
+  # --- Execution settings (for /speckit.squad.run) ---
+  execution:
+    # Max number of agent sessions running in parallel.
+    parallel_limit: 3
+
+    # Automatically create a PR when an agent completes a task.
+    auto_pr: false
+
+    # Abort an agent session if it exceeds this duration (minutes).
+    session_timeout_minutes: 30
+
+    # Branch naming pattern. Placeholders: {agent}, {task-id}
+    branch_pattern: "squad/{agent}/{task-id}"
+
+    # Copilot flags passed to agent sessions.
+    copilot_flags: "--yolo"
