@@ -24,7 +24,7 @@ jobs:
           echo "date=$(date -u +%Y-%m-%dT00:00:00Z)" >> $GITHUB_OUTPUT
 
       - name: Checkout spec-kit-squad
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           token: ${{ secrets.GH_TOKEN }}
 
